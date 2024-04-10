@@ -3,6 +3,7 @@ package com.poc.exceltojavapojolist.adapter.income.mapper;
 import com.poc.exceltojavapojolist.application.income.CreateLeadInPort.CreateLeadRequest;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,18 +22,19 @@ public class ExcelMapper {
       Sheet sheet = workbook.getSheetAt(0);
 
       List<CreateLeadRequest> leadRequestList = new ArrayList<>();
+      Iterator<Row> rowIterator = sheet.rowIterator();
 
-      for (Row row : sheet) {
-        if(row.getRowNum() == 0 && checkIfTitleRow(row)) {
-          continue;
-        }
-        CreateLeadRequest leadRequest =
-            new CreateLeadRequest(
-                row.getCell(0).getStringCellValue(),
-                row.getCell(1).getStringCellValue()
-            );
-        leadRequestList.add(leadRequest);
-      }
+      checkTitleRow(rowIterator.next());
+
+      rowIterator.forEachRemaining(
+          row ->{
+            CreateLeadRequest leadRequest = new CreateLeadRequest();
+            leadRequest.setName(row.getCell(0).getStringCellValue());
+            leadRequest.setEmail(row.getCell(1).getStringCellValue());
+            leadRequestList.add(leadRequest);
+          }
+      );
+
       return leadRequestList;
     } catch (Exception e) {
       log.error("Error converting file to leads", e);
@@ -40,7 +42,10 @@ public class ExcelMapper {
     }
   }
 
-  private boolean checkIfTitleRow(Row row) {
-    return row.getCell(0).getStringCellValue().equals("name");
+  private void checkTitleRow(Row row) {
+    if(!row.getCell(0).getStringCellValue().equals("name") ||
+        !row.getCell(1).getStringCellValue().equals("email")){
+      throw new RuntimeException("Errors in the title row file");
+    }
   }
 }

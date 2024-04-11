@@ -3,7 +3,7 @@ package com.poc.exceltojavapojolist.adapter.income.mapper;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.poc.exceltojavapojolist.application.income.CreateLeadInPort.CreateLeadRequest;
+import com.poc.exceltojavapojolist.adapter.income.dto.LeadDto;
 import java.io.InputStream;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CsvFileMapper {
 
-  public List<CreateLeadRequest> fromCsvWithHeader(InputStream file) {
+  public List<LeadDto> fromCsvWithHeader(InputStream file) {
     try {
       CsvSchema schema = CsvSchema.emptySchema().withHeader();
-      MappingIterator<CreateLeadRequest> genericIterator = new CsvMapper()
-          .readerWithSchemaFor(CreateLeadRequest.class).with(schema).readValues(file);
+      MappingIterator<LeadDto> genericIterator = new CsvMapper()
+          .readerWithSchemaFor(LeadDto.class).with(schema).readValues(file);
       return genericIterator.readAll();
     } catch (Exception e) {
       log.error("Error converting file to leads", e);

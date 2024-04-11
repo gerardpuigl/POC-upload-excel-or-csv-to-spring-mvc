@@ -1,6 +1,7 @@
 package com.poc.exceltojavapojolist.adapter.income.mapper;
 
-import com.poc.exceltojavapojolist.application.income.CreateLeadInPort.CreateLeadRequest;
+import com.poc.exceltojavapojolist.adapter.income.dto.LeadDto;
+import com.poc.exceltojavapojolist.adapter.income.dto.LeadDto.LeadDtoBuilder;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,22 +17,22 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ExcelMapper {
 
-  public List<CreateLeadRequest> excelFileToList(InputStream file) {
+  public List<LeadDto> excelFileToList(InputStream file) {
     try {
       Workbook workbook = new XSSFWorkbook(file);
       Sheet sheet = workbook.getSheetAt(0);
 
-      List<CreateLeadRequest> leadRequestList = new ArrayList<>();
+      List<LeadDto> leadRequestList = new ArrayList<>();
       Iterator<Row> rowIterator = sheet.rowIterator();
 
       checkTitleRow(rowIterator.next());
 
       rowIterator.forEachRemaining(
           row ->{
-            CreateLeadRequest leadRequest = new CreateLeadRequest();
-            leadRequest.setName(row.getCell(0).getStringCellValue());
-            leadRequest.setEmail(row.getCell(1).getStringCellValue());
-            leadRequestList.add(leadRequest);
+            LeadDtoBuilder leadRequest = LeadDto.builder();
+            leadRequest.name(row.getCell(0).getStringCellValue());
+            leadRequest.email(row.getCell(1).getStringCellValue());
+            leadRequestList.add(leadRequest.build());
           }
       );
 

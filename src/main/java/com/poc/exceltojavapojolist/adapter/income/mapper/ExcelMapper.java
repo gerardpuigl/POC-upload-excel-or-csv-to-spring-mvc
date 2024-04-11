@@ -21,19 +21,15 @@ public class ExcelMapper {
     try {
       Workbook workbook = new XSSFWorkbook(file);
       Sheet sheet = workbook.getSheetAt(0);
-
-      List<LeadDto> leadRequestList = new ArrayList<>();
       Iterator<Row> rowIterator = sheet.rowIterator();
 
       checkTitleRow(rowIterator.next());
 
+      List<LeadDto> leadRequestList = new ArrayList<>();
+
       rowIterator.forEachRemaining(
-          row ->{
-            LeadDtoBuilder leadRequest = LeadDto.builder();
-            leadRequest.name(row.getCell(0).getStringCellValue());
-            leadRequest.email(row.getCell(1).getStringCellValue());
-            leadRequestList.add(leadRequest.build());
-          }
+          row -> leadRequestList.add(mapRowToLeadDto(row))
+
       );
 
       return leadRequestList;
@@ -41,6 +37,13 @@ public class ExcelMapper {
       log.error("Error converting file to leads", e);
       throw new RuntimeException("Error converting file to leads", e);
     }
+  }
+
+  private LeadDto mapRowToLeadDto(Row row) {
+    LeadDtoBuilder leadRequest = LeadDto.builder();
+    leadRequest.name(row.getCell(0).getStringCellValue());
+    leadRequest.email(row.getCell(1).getStringCellValue());
+    return leadRequest.build();
   }
 
   private void checkTitleRow(Row row) {

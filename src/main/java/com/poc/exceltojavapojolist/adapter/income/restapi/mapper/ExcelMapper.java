@@ -45,7 +45,7 @@ public class ExcelMapper {
     mappingErrors.clear();
     checkTitleRow(rowIterator.next());
 
-    return mapToLeadsDtoList(rowIterator);
+    return mapRowsToLeadsDtoList(rowIterator);
   }
 
   private void checkTitleRow(Row row) {
@@ -58,6 +58,7 @@ public class ExcelMapper {
       }
     });
 
+    //Check all data before to fail to provide all the errors to the stakeholder.
     if (mappingErrors.size() > 0) {
       throw new CustomApplicationException(
           "Errors in the file title row.", "The title row doesn't have the expected values.",
@@ -65,7 +66,7 @@ public class ExcelMapper {
     }
   }
 
-  private List<LeadDto> mapToLeadsDtoList(Iterator<Row> rowIterator) {
+  private List<LeadDto> mapRowsToLeadsDtoList(Iterator<Row> rowIterator) {
     List<LeadDto> leadRequestList = new ArrayList<>();
 
     rowIterator.forEachRemaining(row -> leadRequestList.add(mapRowToLeadDto(row)));

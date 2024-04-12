@@ -31,7 +31,7 @@ public class CsvFileMapper {
       int RowNum=0;
       BufferedReader br = new BufferedReader(new InputStreamReader(file));
       while ((row = br.readLine()) != null) {
-        String str[] = row.split(",");
+        String[] str = row.split(",");
         RowNum++;
         XSSFRow currentRow=sheet.createRow(RowNum);
         for(int i=0;i<str.length;i++){
@@ -46,9 +46,17 @@ public class CsvFileMapper {
     return workBook;
   }
 
-  //Alternative way to create the list without excel library.
-  //With the csvFileToExcelWorkbook approach we can reuse all the logic in the ExcelMapper
-  //(validate data,error handling,etc)
+  /**
+   * Alternative way to create the list without excel library.
+   *
+   * With the csvFileToExcelWorkbook(InputStream file) method, we get XSSFWorkbook and then we can reuse all the logic
+   * in theExcelMapper (validate data,error handling,etc)
+   *
+   * Provably all validations can be done here, but I need to support both file extensions and it will easy to
+   * maintain in one single place.
+   *
+   */
+
   public List<LeadDto> fromCsvWithHeader(InputStream file) {
     try {
       CsvSchema schema = CsvSchema.emptySchema().withHeader();

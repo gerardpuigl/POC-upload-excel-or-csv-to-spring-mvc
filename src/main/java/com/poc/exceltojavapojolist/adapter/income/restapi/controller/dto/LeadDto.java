@@ -1,4 +1,4 @@
-package com.poc.exceltojavapojolist.adapter.income.dto;
+package com.poc.exceltojavapojolist.adapter.income.restapi.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

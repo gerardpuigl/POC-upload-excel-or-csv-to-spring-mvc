@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,7 +48,8 @@ public class LeadFileController {
 
     }
     if (Objects.equals(file.getContentType(), CSV_FILE_TYPE)) {
-      return csvFileMapper.fromCsvWithHeader(file.getInputStream());
+      XSSFWorkbook workbook = csvFileMapper.csvFileToExcelWorkbook(file.getInputStream());
+      return excelMapper.workBookToList(workbook);
 
     } else {
       throw new RuntimeException("File has not accepted format");

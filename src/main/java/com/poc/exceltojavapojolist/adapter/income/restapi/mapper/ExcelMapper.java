@@ -29,11 +29,16 @@ import org.springframework.stereotype.Component;
 public class ExcelMapper {
 
   private final Validator validator;
+
   private final List<String> titleExpectedStructure = List.of("name", "email");
   private final Map<String, String> mappingErrors = new LinkedHashMap<>();
 
   public List<LeadDto> excelFileToList(InputStream file) throws IOException {
     Workbook workbook = new XSSFWorkbook(file);
+    return workBookToList(workbook);
+  }
+
+  public List<LeadDto> workBookToList(Workbook workbook) {
     Sheet sheet = workbook.getSheetAt(0);
     Iterator<Row> rowIterator = sheet.rowIterator();
 

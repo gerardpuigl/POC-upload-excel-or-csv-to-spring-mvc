@@ -53,7 +53,7 @@ public class ExcelMapper {
       String expectedColumnTitle = titleStructure.get(cell.getColumnIndex());
       if(!cell.getStringCellValue().equals(expectedColumnTitle)){
         titleErrors.put(
-            "Error in row: %d column: %d".formatted(cell.getRowIndex(), cell.getColumnIndex()),
+            "Error in row: %d column: %d".formatted(cell.getRowIndex()+1, cell.getColumnIndex()+1),
             "Expected value: '%s' but it was: '%s'".formatted(expectedColumnTitle,
                 cell.getStringCellValue()));
       }});

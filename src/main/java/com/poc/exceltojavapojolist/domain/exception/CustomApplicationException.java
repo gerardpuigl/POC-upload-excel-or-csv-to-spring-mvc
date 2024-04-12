@@ -47,7 +47,7 @@ public class CustomApplicationException extends RuntimeException{
   }
 
   public void addInvalidParams(Map<String,String> invalidParamsMap) {
-    invalidParamsMap.forEach(((name,reson) ->
-        invalidParams.add(new InvalidParam(name,reson))));
+    invalidParamsMap.forEach(((name,reason) ->
+        invalidParams.add(new InvalidParam(name,reason))));
   }
 }

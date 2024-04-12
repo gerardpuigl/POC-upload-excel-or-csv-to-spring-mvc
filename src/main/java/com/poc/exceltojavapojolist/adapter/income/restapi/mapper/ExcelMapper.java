@@ -53,14 +53,14 @@ public class ExcelMapper {
       String expectedColumnTitle = titleStructure.get(cell.getColumnIndex());
       if(!cell.getStringCellValue().equals(expectedColumnTitle)){
         titleErrors.put(
-            "Error in row: %s column: '%d'".formatted(cell.getRowIndex(), cell.getColumnIndex()),
-            "Expected: '%s' but it was: '%s' in the title row".formatted(expectedColumnTitle,
+            "Error in row: %d column: %d".formatted(cell.getRowIndex(), cell.getColumnIndex()),
+            "Expected value: '%s' but it was: '%s'".formatted(expectedColumnTitle,
                 cell.getStringCellValue()));
       }});
 
     if(titleErrors.size() >0){
       throw new CustomApplicationException(
-          "Errors in the file title row.", "The title row doesn't have the values expected",
+          "Errors in the file title row.", "The title row doesn't have the expected values",
           HttpStatus.EXPECTATION_FAILED.value(),titleErrors);
     }
   }

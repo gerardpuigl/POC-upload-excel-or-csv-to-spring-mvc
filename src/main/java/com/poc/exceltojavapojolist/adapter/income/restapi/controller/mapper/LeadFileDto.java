@@ -1,4 +1,4 @@
-package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures;
+package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper;
 
 public interface LeadFileDto {
   int getRowIndex();

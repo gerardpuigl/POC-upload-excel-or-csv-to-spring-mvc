@@ -1,7 +1,6 @@
 package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper;
 
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.dto.LeadDto;
-import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadFileDto;
 import org.springframework.stereotype.Component;
 
 @Component

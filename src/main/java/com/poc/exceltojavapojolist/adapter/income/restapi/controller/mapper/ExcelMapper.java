@@ -1,7 +1,6 @@
 package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper;
 
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadStructures;
-import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadFileDto;
 import com.poc.exceltojavapojolist.domain.exception.CustomApplicationException;
 import com.poiji.bind.Poiji;
 import com.poiji.exception.HeaderMissingException;

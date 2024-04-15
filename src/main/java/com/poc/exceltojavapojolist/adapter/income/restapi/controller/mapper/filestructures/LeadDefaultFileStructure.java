@@ -1,5 +1,6 @@
 package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures;
 
+import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.LeadFileDto;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelRow;
 import jakarta.validation.constraints.Email;

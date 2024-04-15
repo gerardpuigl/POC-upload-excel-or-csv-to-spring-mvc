@@ -4,7 +4,7 @@ import com.poc.exceltojavapojolist.adapter.income.restapi.controller.dto.LeadDto
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.CsvFileMapper;
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.ExcelMapper;
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.LeadMapper;
-import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadFileDto;
+import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.LeadFileDto;
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadStructures;
 import java.io.IOException;
 import java.util.List;
@@ -31,10 +31,9 @@ public class LeadFileController {
   private final LeadMapper leadMapper;
 
   @RequestMapping(method = RequestMethod.POST, value = "/leads/convertfile")
-  public List<LeadDto> convertFile(@RequestParam("file") MultipartFile file,
-      @RequestParam(value = "structure", defaultValue = "default") String fileStructure) {
+  public List<LeadDto> convertFile(@RequestParam("file") MultipartFile file) {
     try {
-      List<LeadFileDto> leadDtoList = geLeadDtoListFromFile(file, LeadStructures.get(fileStructure));
+      List<LeadFileDto> leadDtoList = geLeadDtoListFromFile(file,LeadStructures.getByFileName(file.getOriginalFilename()));
 
       leadDtoList.forEach(l -> log.info("Lead received {}", l.toString()));
       // HERE we may send to interactor and persiste in database, publish events.

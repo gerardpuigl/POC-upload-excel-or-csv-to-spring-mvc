@@ -1,5 +1,6 @@
 package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures;
 
+import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.LeadFileDto;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelRow;
 import jakarta.validation.constraints.Email;
@@ -25,7 +26,7 @@ public class LeadOptionalFileStructure implements LeadFileDto {
     @Email
     private String email;
 
-    //use getter to map as the library poiji library use reflection internally
+    //use getter to transform locale if necessary as the library poiji library use reflection internally
     public String getLanguage(){
         return language + "_DE";
     }

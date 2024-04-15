@@ -44,10 +44,7 @@ public class ExcelMapper {
 
   private List<LeadDto> getLeadDtoList(Sheet sheet) {
     try {
-      return Poiji.fromExcel(
-          sheet,
-          LeadDto.class,
-          PoijiOptionsBuilder.settings().sheetIndex(0).build());
+      return Poiji.fromExcel(sheet, LeadDto.class);
     } catch (HeaderMissingException ex){
       throw new CustomApplicationException(
           "Missing expected columns.",

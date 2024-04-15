@@ -25,13 +25,14 @@ public class CsvFileMapper {
       String row;
       int RowNum = 0;
       BufferedReader br = new BufferedReader(new InputStreamReader(file));
+
       while ((row = br.readLine()) != null) {
         String[] str = row.split(",");
-        RowNum++;
         XSSFRow currentRow = sheet.createRow(RowNum);
         for (int i = 0; i < str.length; i++) {
           currentRow.createCell(i).setCellValue(str[i]);
         }
+        RowNum++;
       }
     } catch (Exception ex) {
       throw new CustomApplicationException(

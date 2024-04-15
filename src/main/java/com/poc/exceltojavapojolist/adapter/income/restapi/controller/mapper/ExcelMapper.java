@@ -1,10 +1,10 @@
-package com.poc.exceltojavapojolist.adapter.income.restapi.mapper;
+package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper;
 
-import com.poc.exceltojavapojolist.adapter.income.restapi.controller.dto.LeadDto;
+import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadStructures;
+import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadFileDto;
 import com.poc.exceltojavapojolist.domain.exception.CustomApplicationException;
 import com.poiji.bind.Poiji;
 import com.poiji.exception.HeaderMissingException;
-import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.io.IOException;
@@ -29,31 +29,32 @@ public class ExcelMapper {
   private final Validator validator;
   private final Map<String, String> mappingErrors = new LinkedHashMap<>();
 
-  public List<LeadDto> excelFileToList(InputStream file) throws IOException {
+  public List<LeadFileDto> excelFileToList(InputStream file, LeadStructures fileStructure) throws IOException {
     Workbook workbook = new XSSFWorkbook(file);
-    return workBookToList(workbook);
+    return workBookToList(workbook,fileStructure);
   }
 
-  public List<LeadDto> workBookToList(Workbook workbook) {
+  public List<LeadFileDto> workBookToList(Workbook workbook, LeadStructures fileStructure) {
     Sheet sheet = workbook.getSheetAt(0);
 
-    List<LeadDto> leadDtoList = getLeadDtoList(sheet);
+    List<LeadFileDto> leadDtoList = getLeadDtoList(sheet,fileStructure);
     validateResults(leadDtoList);
     return leadDtoList;
   }
 
-  private List<LeadDto> getLeadDtoList(Sheet sheet) {
+  private List<LeadFileDto> getLeadDtoList(Sheet sheet, LeadStructures fileStructure) {
     try {
-      return Poiji.fromExcel(sheet, LeadDto.class);
+      return Poiji.fromExcel(sheet, fileStructure.getFileClass())
+      .stream().map(leadFileDto -> (LeadFileDto) leadFileDto).toList();
     } catch (HeaderMissingException ex){
       throw new CustomApplicationException(
           "Missing expected columns.",
-          "Following columns are missing %s".formatted(ex.getMissingExcelCellNameHeaders()),
+          "The following columns were not found %s".formatted(ex.getMissingExcelCellNameHeaders()),
           HttpStatus.EXPECTATION_FAILED.value(), mappingErrors);
     }
   }
 
-  private void validateResults(List<LeadDto> leadDtoList) {
+  private void validateResults(List<LeadFileDto> leadDtoList) {
     mappingErrors.clear();
 
     leadDtoList.forEach(this::validateLead);
@@ -65,8 +66,8 @@ public class ExcelMapper {
     }
   }
 
-  private void validateLead(LeadDto leadDto) {
-    Set<ConstraintViolation<LeadDto>> validate = validator.validate(leadDto);
+  private void validateLead(LeadFileDto leadDto) {
+    Set<ConstraintViolation<LeadFileDto>> validate = validator.validate(leadDto);
     validate.forEach(e -> mappingErrors.put(
         "Error for lead in row: %d".formatted(leadDto.getRowIndex() + 1),
         "'%s' '%s'".formatted(e.getPropertyPath(), e.getMessage())));

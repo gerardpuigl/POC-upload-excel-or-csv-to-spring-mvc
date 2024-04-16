@@ -5,7 +5,6 @@ import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.CsvF
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.ExcelMapper;
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.LeadMapper;
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.LeadFileDto;
-import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadStructures;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -30,10 +29,10 @@ public class LeadFileController {
   private final CsvFileMapper csvFileMapper;
   private final LeadMapper leadMapper;
 
-  @RequestMapping(method = RequestMethod.POST, value = "/leads/convertfile")
+  @RequestMapping(method = RequestMethod.POST, value = "/leads/file")
   public List<LeadDto> convertFile(@RequestParam("file") MultipartFile file) {
     try {
-      List<LeadFileDto> leadDtoList = geLeadDtoListFromFile(file,LeadStructures.getByFileName(file.getOriginalFilename()));
+      List<LeadFileDto> leadDtoList = geLeadDtoListFromFile(file);
 
       leadDtoList.forEach(l -> log.info("Lead received {}", l.toString()));
       // HERE we may send to interactor and persiste in database, publish events.
@@ -45,14 +44,14 @@ public class LeadFileController {
     }
   }
 
-  private List<LeadFileDto> geLeadDtoListFromFile(MultipartFile file, LeadStructures fileStructure) throws IOException {
+  private List<LeadFileDto> geLeadDtoListFromFile(MultipartFile file) throws IOException {
     if (Objects.equals(file.getContentType(), EXCEL_FILE_TYPE)) {
-      return excelMapper.excelFileToList(file.getInputStream(), fileStructure);
+      return excelMapper.excelFileToList(file.getInputStream());
 
     }
     if (Objects.equals(file.getContentType(), CSV_FILE_TYPE)) {
       XSSFWorkbook workbook = csvFileMapper.csvFileToExcelWorkbook(file.getInputStream());
-      return excelMapper.workBookToList(workbook, fileStructure);
+      return excelMapper.workBookToList(workbook);
 
     } else {
       throw new RuntimeException("File has not accepted format");

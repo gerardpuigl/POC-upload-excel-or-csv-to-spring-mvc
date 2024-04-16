@@ -1,6 +1,6 @@
 package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper;
 
-import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadStructures;
+import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.StructureSelectorFactory;
 import com.poc.exceltojavapojolist.domain.exception.CustomApplicationException;
 import com.poiji.bind.Poiji;
 import com.poiji.exception.HeaderMissingException;
@@ -28,22 +28,24 @@ public class ExcelMapper {
   private final Validator validator;
   private final Map<String, String> mappingErrors = new LinkedHashMap<>();
 
-  public List<LeadFileDto> excelFileToList(InputStream file, LeadStructures fileStructure) throws IOException {
+  private final StructureSelectorFactory selectorFactory;
+
+  public List<LeadFileDto> excelFileToList(InputStream file) throws IOException {
     Workbook workbook = new XSSFWorkbook(file);
-    return workBookToList(workbook,fileStructure);
+    return workBookToList(workbook);
   }
 
-  public List<LeadFileDto> workBookToList(Workbook workbook, LeadStructures fileStructure) {
+  public List<LeadFileDto> workBookToList(Workbook workbook) {
     Sheet sheet = workbook.getSheetAt(0);
 
-    List<LeadFileDto> leadDtoList = getLeadDtoList(sheet,fileStructure);
+    List<LeadFileDto> leadDtoList = getLeadDtoList(sheet);
     validateResults(leadDtoList);
     return leadDtoList;
   }
 
-  private List<LeadFileDto> getLeadDtoList(Sheet sheet, LeadStructures fileStructure) {
+  private List<LeadFileDto> getLeadDtoList(Sheet sheet) {
     try {
-      return Poiji.fromExcel(sheet, fileStructure.getFileClass())
+      return Poiji.fromExcel(sheet, selectorFactory.getStructureClassToUse(sheet))
       .stream().map(leadFileDto -> (LeadFileDto) leadFileDto).toList();
     } catch (HeaderMissingException ex){
       throw new CustomApplicationException(
@@ -54,9 +56,9 @@ public class ExcelMapper {
   }
 
   private void validateResults(List<LeadFileDto> leadDtoList) {
-    mappingErrors.clear();
+    Map<String, String> mappingErrors = new LinkedHashMap<>();
 
-    leadDtoList.forEach(this::validateLead);
+    leadDtoList.forEach(l -> validateLead(l, mappingErrors));
 
     if (mappingErrors.size() > 0) {
       throw new CustomApplicationException(
@@ -65,7 +67,7 @@ public class ExcelMapper {
     }
   }
 
-  private void validateLead(LeadFileDto leadDto) {
+  private void validateLead(LeadFileDto leadDto, Map<String, String> mappingErrors) {
     Set<ConstraintViolation<LeadFileDto>> validate = validator.validate(leadDto);
     validate.forEach(e -> mappingErrors.put(
         "Error for lead in row: %d".formatted(leadDto.getRowIndex() + 1),

@@ -1,3 +1,3 @@
-name,email
-lead1_csv,lead1csv@test.com
-lead2_csv,lead2csv@test.com
+name,email,language
+lead1,lead1csv@test.com,es_DE
+lead2,lead2csv@test.com,de_DE

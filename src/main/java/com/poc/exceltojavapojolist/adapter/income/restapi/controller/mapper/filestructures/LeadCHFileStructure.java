@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class LeadOptionalFileStructure implements LeadFileDto {
+public class LeadCHFileStructure implements LeadFileDto {
 
     @ExcelRow
     private int rowIndex;

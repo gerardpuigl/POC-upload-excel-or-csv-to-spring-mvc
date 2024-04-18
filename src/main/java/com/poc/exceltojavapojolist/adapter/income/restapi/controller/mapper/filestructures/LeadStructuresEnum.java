@@ -5,7 +5,7 @@ import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.Lead
 public enum LeadStructuresEnum {
 
   DEFAULT("default", LeadDefaultFileStructure.class),
-  OPTIONAL("optional", LeadOptionalFileStructure.class);
+  CH("ch", LeadCHFileStructure.class);
 
   private final Class<? extends LeadFileDto> fileClass;
   private final String value;

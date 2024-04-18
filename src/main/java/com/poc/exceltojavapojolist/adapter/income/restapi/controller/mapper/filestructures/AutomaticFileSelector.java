@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class AutomaticFileSelector {
 
   private final List<Class<? extends LeadFileDto>> supportedFileStructures =
-      List.of(LeadDefaultFileStructure.class, LeadOptionalFileStructure.class);
+      List.of(LeadDefaultFileStructure.class, LeadCHFileStructure.class);
 
   private final Map<Class<? extends LeadFileDto>, Set<String>> mandatoryColumnsPerStructure =
       supportedFileStructures.stream().collect(Collectors.toMap(c -> c, this::getMandatoryExcelColumnNamesByGivenClass));

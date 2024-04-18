@@ -3,7 +3,6 @@ package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.fil
 import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.LeadFileDto;
 import com.poiji.annotation.ExcelCellName;
 import java.lang.reflect.Field;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +15,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StructureSelectorFactoryImp implements StructureSelectorFactory {
+public class AutomaticFileSelector {
 
   private final List<Class<? extends LeadFileDto>> supportedFileStructures =
       List.of(LeadDefaultFileStructure.class, LeadOptionalFileStructure.class);
@@ -25,7 +24,7 @@ public class StructureSelectorFactoryImp implements StructureSelectorFactory {
       supportedFileStructures.stream().collect(Collectors.toMap(c -> c, this::getMandatoryExcelColumnNamesByGivenClass));
 
 
-  public Class<? extends LeadFileDto> getStructureClassToUse(Sheet sheet) {
+  public Class<? extends LeadFileDto> calculateBestStructureToUse(Sheet sheet) {
     return getMostSimilarStructure(sheet.getRow(0).cellIterator());
   }
 
@@ -45,15 +44,15 @@ public class StructureSelectorFactoryImp implements StructureSelectorFactory {
     Set<String> columnHeaders = new HashSet<>();
     cellIterator.forEachRemaining(cell -> columnHeaders.add(cell.getStringCellValue()));
     Map<? extends Class<? extends LeadFileDto>, Integer> calculatedCommonHeaders = calculateNumberOfCommonHeaders(columnHeaders);
-   return calculatedCommonHeaders.entrySet().stream().sorted(Entry.comparingByValue(Comparator.reverseOrder())).findFirst().get().getKey();
+   return calculatedCommonHeaders.entrySet().stream().sorted(Entry.comparingByValue()).findFirst().get().getKey();
   }
 
   private Map<? extends Class<? extends LeadFileDto>, Integer> calculateNumberOfCommonHeaders(Set<String> columnHeaders) {
     return mandatoryColumnsPerStructure.entrySet().stream()
         .collect(Collectors.toMap(Entry::getKey,
             m -> {
-              m.getValue().removeAll(columnHeaders);
-              return columnHeaders.size() - m.getValue().size();
+              columnHeaders.removeAll(m.getValue());
+              return columnHeaders.size();
             }));
   }
 }

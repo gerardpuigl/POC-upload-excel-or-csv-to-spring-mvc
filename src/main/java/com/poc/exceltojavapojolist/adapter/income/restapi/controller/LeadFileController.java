@@ -8,6 +8,7 @@ import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.Lead
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -30,9 +31,10 @@ public class LeadFileController {
   private final LeadMapper leadMapper;
 
   @RequestMapping(method = RequestMethod.POST, value = "/leads/file")
-  public List<LeadDto> convertFile(@RequestParam("file") MultipartFile file) {
+  public List<LeadDto> convertFile(@RequestParam("file") MultipartFile file, @RequestParam Optional<String> structure) {
+
     try {
-      List<LeadFileDto> leadDtoList = geLeadDtoListFromFile(file);
+      List<LeadFileDto> leadDtoList = geLeadDtoListFromFile(file,structure);
 
       leadDtoList.forEach(l -> log.info("Lead received {}", l.toString()));
       // HERE we may send to interactor and persiste in database, publish events.
@@ -44,14 +46,14 @@ public class LeadFileController {
     }
   }
 
-  private List<LeadFileDto> geLeadDtoListFromFile(MultipartFile file) throws IOException {
+  private List<LeadFileDto> geLeadDtoListFromFile(MultipartFile file, Optional<String> structure) throws IOException {
     if (Objects.equals(file.getContentType(), EXCEL_FILE_TYPE)) {
-      return excelMapper.excelFileToList(file.getInputStream());
+      return excelMapper.excelFileToList(file.getInputStream(),structure);
 
     }
     if (Objects.equals(file.getContentType(), CSV_FILE_TYPE)) {
       XSSFWorkbook workbook = csvFileMapper.csvFileToExcelWorkbook(file.getInputStream());
-      return excelMapper.workBookToList(workbook);
+      return excelMapper.workBookToList(workbook,structure);
 
     } else {
       throw new RuntimeException("File has not accepted format");

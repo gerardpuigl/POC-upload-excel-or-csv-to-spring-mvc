@@ -1,6 +1,7 @@
 package com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper;
 
-import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.StructureSelectorFactory;
+import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.AutomaticFileSelector;
+import com.poc.exceltojavapojolist.adapter.income.restapi.controller.mapper.filestructures.LeadStructuresEnum;
 import com.poc.exceltojavapojolist.domain.exception.CustomApplicationException;
 import com.poiji.bind.Poiji;
 import com.poiji.exception.HeaderMissingException;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,30 +30,39 @@ public class ExcelMapper {
   private final Validator validator;
   private final Map<String, String> mappingErrors = new LinkedHashMap<>();
 
-  private final StructureSelectorFactory selectorFactory;
+  private final AutomaticFileSelector fileStructureSelector;
 
-  public List<LeadFileDto> excelFileToList(InputStream file) throws IOException {
+
+  public List<LeadFileDto> excelFileToList(InputStream file, Optional<String> structure) throws IOException {
     Workbook workbook = new XSSFWorkbook(file);
-    return workBookToList(workbook);
+    return workBookToList(workbook,structure);
   }
 
-  public List<LeadFileDto> workBookToList(Workbook workbook) {
+  public List<LeadFileDto> workBookToList(Workbook workbook, Optional<String> structure) {
     Sheet sheet = workbook.getSheetAt(0);
-
-    List<LeadFileDto> leadDtoList = getLeadDtoList(sheet);
+    List<LeadFileDto> leadDtoList = getLeadDtoList(sheet,structure);
     validateResults(leadDtoList);
     return leadDtoList;
   }
 
-  private List<LeadFileDto> getLeadDtoList(Sheet sheet) {
+  private List<LeadFileDto> getLeadDtoList(Sheet sheet, Optional<String> structure) {
     try {
-      return Poiji.fromExcel(sheet, selectorFactory.getStructureClassToUse(sheet))
+      Class<? extends LeadFileDto> classToMap = getClassToMapTheList(sheet,structure);
+      return Poiji.fromExcel(sheet, classToMap)
       .stream().map(leadFileDto -> (LeadFileDto) leadFileDto).toList();
     } catch (HeaderMissingException ex){
       throw new CustomApplicationException(
           "Missing expected columns.",
           "The following columns were not found %s".formatted(ex.getMissingExcelCellNameHeaders()),
           HttpStatus.EXPECTATION_FAILED.value(), mappingErrors);
+    }
+  }
+
+  private Class<? extends LeadFileDto> getClassToMapTheList(Sheet sheet,Optional<String> structure) {
+    if(structure.isPresent()){
+      return LeadStructuresEnum.get(structure.get()).getFileClass();
+    }else {
+      return fileStructureSelector.calculateBestStructureToUse(sheet);
     }
   }
 

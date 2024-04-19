@@ -47,9 +47,11 @@ public class ExcelMapper {
 
   private List<LeadFileDto> getLeadDtoList(Sheet sheet, Optional<String> structure) {
     try {
-      Class<? extends LeadFileDto> classToMap = getClassToMapTheList(sheet,structure);
+      Class<? extends LeadFileDto> classToMap = getClassToMap(sheet,structure);
+
       return Poiji.fromExcel(sheet, classToMap)
       .stream().map(leadFileDto -> (LeadFileDto) leadFileDto).toList();
+
     } catch (HeaderMissingException ex){
       throw new CustomApplicationException(
           "Missing expected columns.",
@@ -58,7 +60,7 @@ public class ExcelMapper {
     }
   }
 
-  private Class<? extends LeadFileDto> getClassToMapTheList(Sheet sheet,Optional<String> structure) {
+  private Class<? extends LeadFileDto> getClassToMap(Sheet sheet,Optional<String> structure) {
     if(structure.isPresent()){
       return LeadStructuresEnum.get(structure.get()).getFileClass();
     }else {

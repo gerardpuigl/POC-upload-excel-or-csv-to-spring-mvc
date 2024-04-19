@@ -40,7 +40,10 @@ public class ExcelMapper {
 
   public List<LeadFileDto> workBookToList(Workbook workbook, Optional<String> structure) {
     Sheet sheet = workbook.getSheetAt(0);
+
+    mappingErrors.clear();
     List<LeadFileDto> leadDtoList = getLeadDtoList(sheet,structure);
+
     validateResults(leadDtoList);
     return leadDtoList;
   }
@@ -53,9 +56,11 @@ public class ExcelMapper {
       .stream().map(leadFileDto -> (LeadFileDto) leadFileDto).toList();
 
     } catch (HeaderMissingException ex){
+      ex.getMissingExcelCellNameHeaders()
+          .forEach(columnMissing ->  mappingErrors.put(columnMissing, "Column not found"));
       throw new CustomApplicationException(
           "Missing expected columns.",
-          "The following columns were not found %s".formatted(ex.getMissingExcelCellNameHeaders()),
+          "One or more expected columns in the file were not found",
           HttpStatus.EXPECTATION_FAILED.value(), mappingErrors);
     }
   }
@@ -69,8 +74,6 @@ public class ExcelMapper {
   }
 
   private void validateResults(List<LeadFileDto> leadDtoList) {
-    Map<String, String> mappingErrors = new LinkedHashMap<>();
-
     leadDtoList.forEach(l -> validateLead(l, mappingErrors));
 
     if (mappingErrors.size() > 0) {
@@ -83,7 +86,7 @@ public class ExcelMapper {
   private void validateLead(LeadFileDto leadDto, Map<String, String> mappingErrors) {
     Set<ConstraintViolation<LeadFileDto>> validate = validator.validate(leadDto);
     validate.forEach(e -> mappingErrors.put(
-        "Error for lead in row: %d".formatted(leadDto.getRowIndex() + 1),
-        "'%s' '%s'".formatted(e.getPropertyPath(), e.getMessage())));
+        "Error in the '%s' for lead in row: %d".formatted(e.getPropertyPath(),leadDto.getRowIndex() + 1),
+        "%s %s".formatted(e.getPropertyPath(), e.getMessage())));
   }
 }

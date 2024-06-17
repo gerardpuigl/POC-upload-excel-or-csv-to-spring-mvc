@@ -2,7 +2,7 @@
 
 ## Goal:
 
-Provide an endpoin to process different files to POJO, the files could be in different formats(excel or csv), also they may have different column headers or maybe we need to do extra mapping or set some constants.
+Provide an endpoint to process different files to POJO, the files could be in different formats(excel or csv), also they may have different column headers or maybe we need to do extra mapping or set some constants.
 
 ## Solution:
 
